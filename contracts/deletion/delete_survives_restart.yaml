@@ -1,0 +1,34 @@
+schema_version: '0.1'
+name: delete_survives_restart
+description: A deleted canary stays absent after reconstruction; a live control survives.
+requires:
+- create
+- delete
+- query
+- restart
+- user_scope
+scope:
+  user_id: alice
+steps:
+- create:
+    id: canary
+    value: '{{canary:CANARY}}'
+- create:
+    id: control
+    value: '{{canary:CANARY_CONTROL}}'
+- expect:
+    query: MEMORYCHECK_CANARY
+    contains:
+    - '{{canary:CANARY}}'
+    - '{{canary:CANARY_CONTROL}}'
+- delete:
+    id: canary
+- expect:
+    query: MEMORYCHECK_CANARY
+    contains: '{{canary:CANARY_CONTROL}}'
+    excludes: '{{canary:CANARY}}'
+- restart: {}
+- expect:
+    query: MEMORYCHECK_CANARY
+    contains: '{{canary:CANARY_CONTROL}}'
+    excludes: '{{canary:CANARY}}'

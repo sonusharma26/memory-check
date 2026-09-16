@@ -1,0 +1,73 @@
+name: Manually validated release
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Confirm the version matching the checked-out tag (for example 0.1.0)
+        required: true
+        type: string
+      target:
+        description: Protected publishing environment; configure trusted publishing first
+        required: true
+        default: testpypi
+        type: choice
+        options: [testpypi, pypi]
+permissions:
+  contents: read
+jobs:
+  source:
+    uses: ./.github/workflows/ci.yml
+  distribution:
+    needs: source
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Validate explicit version tag
+        env:
+          CONFIRMED_VERSION: ${{ inputs.version }}
+          RELEASE_REF: ${{ github.ref }}
+        run: |
+          python - <<'PY'
+          import os, runpy
+          version = runpy.run_path('memorycheck/_version.py')['__version__']
+          assert os.environ['CONFIRMED_VERSION'] == version, 'Version confirmation mismatch'
+          assert os.environ['RELEASE_REF'] == 'refs/tags/v' + version, 'Run this workflow from the matching version tag'
+          PY
+      - name: Install packaging tools
+        run: |
+          python -m pip install --only-binary=:all: 'build>=1.2,<2' 'twine>=5,<7'
+      - name: Build distribution (explicit maintainer release action only)
+        run: python -m build
+      - name: Validate package metadata
+        run: python -m twine check dist/*
+      - name: Install and exercise wheel and sdist outside source tree
+        run: python scripts/distribution_smoke.py dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: distributions
+          path: dist/*
+          retention-days: 7
+  publish:
+    needs: distribution
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: ${{ inputs.target }}
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: distributions
+          path: dist
+      - name: Publish to TestPyPI
+        if: inputs.target == 'testpypi'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+      - name: Publish to PyPI
+        if: inputs.target == 'pypi'
+        uses: pypa/gh-action-pypi-publish@release/v1

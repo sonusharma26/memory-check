@@ -1,0 +1,29 @@
+schema_version: '0.1'
+name: correction_survives_restart
+requires:
+- create
+- update
+- query
+- restart
+- user_scope
+scope:
+  user_id: alice
+steps:
+- create:
+    id: region
+    value: '{{canary:REGION}} = us-west'
+- expect:
+    query: '{{canary:REGION}}'
+    contains: '{{canary:REGION}} = us-west'
+- update:
+    id: region
+    value: '{{canary:REGION}} = eu-west'
+- expect:
+    query: '{{canary:REGION}}'
+    contains: '{{canary:REGION}} = eu-west'
+    excludes: '{{canary:REGION}} = us-west'
+- restart: {}
+- expect:
+    query: '{{canary:REGION}}'
+    contains: '{{canary:REGION}} = eu-west'
+    excludes: '{{canary:REGION}} = us-west'

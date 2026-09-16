@@ -1,0 +1,24 @@
+schema_version: '0.1'
+name: update_replaces_old_value
+description: Correction exposes the replacement and excludes the prior value.
+requires:
+- create
+- query
+- update
+- user_scope
+scope:
+  user_id: alice
+steps:
+- create:
+    id: deployment_region
+    value: '{{canary:REGION}} = us-west'
+- expect:
+    query: '{{canary:REGION}}'
+    contains: '{{canary:REGION}} = us-west'
+- update:
+    id: deployment_region
+    value: '{{canary:REGION}} = eu-west'
+- expect:
+    query: '{{canary:REGION}}'
+    contains: '{{canary:REGION}} = eu-west'
+    excludes: '{{canary:REGION}} = us-west'

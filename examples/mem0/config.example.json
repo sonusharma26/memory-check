@@ -1,0 +1,11 @@
+{
+  "vector_store": {
+    "provider": "qdrant",
+    "config": {
+      "host": "localhost",
+      "port": 6333,
+      "collection_name": "memorycheck_test_memories"
+    }
+  },
+  "history_db_path": ".memorycheck/mem0-history.db"
+}

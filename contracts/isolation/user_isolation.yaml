@@ -1,0 +1,26 @@
+schema_version: '0.1'
+name: user_isolation
+description: Both users can retrieve their own canaries without seeing the other user.
+requires:
+- create
+- query
+- user_scope
+steps:
+- create:
+    id: alice_project
+    value: '{{canary:PROJECT}} = ORION'
+    user_id: alice
+- create:
+    id: bob_project
+    value: '{{canary:PROJECT}} = LYRA'
+    user_id: bob
+- expect:
+    query: '{{canary:PROJECT}}'
+    contains: '{{canary:PROJECT}} = ORION'
+    excludes: '{{canary:PROJECT}} = LYRA'
+    user_id: alice
+- expect:
+    query: '{{canary:PROJECT}}'
+    contains: '{{canary:PROJECT}} = LYRA'
+    excludes: '{{canary:PROJECT}} = ORION'
+    user_id: bob

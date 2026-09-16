@@ -1,0 +1,49 @@
+name: Memory lifecycle bug report
+description: Report a reproducible lifecycle or integration problem using synthetic data.
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: "Use synthetic data and redacted traces. Never attach credentials, raw provider logs, or .memorycheck/runs/ manifests. Use private reporting for security-sensitive details."
+  - type: textarea
+    id: versions
+    attributes:
+      label: Version information
+      description: Paste memorycheck --version --verbose, plus the exact backend/server version.
+    validations:
+      required: true
+  - type: dropdown
+    id: adapter
+    attributes:
+      label: Adapter
+      options: [reference, mem0, langgraph, custom]
+    validations:
+      required: true
+  - type: textarea
+    id: contract
+    attributes:
+      label: Minimal synthetic contract
+      description: Include schema_version and the contract name; no production payloads.
+      render: yaml
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Expected and observed behavior
+      description: Include PASS/FAIL/SKIP/ERROR, first divergence, and API/storage availability.
+    validations:
+      required: true
+  - type: textarea
+    id: trace
+    attributes:
+      label: Redacted trace attachment
+      description: Attach the JSON trace after inspecting it. Do not attach private cleanup manifests.
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Artifact safety
+      options:
+        - label: I inspected the reproduction and artifacts and removed credentials and personal data.
+          required: true

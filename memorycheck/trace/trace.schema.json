@@ -1,0 +1,488 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MemoryCheck lifecycle trace v0.1",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "0.1"
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "contract": {
+      "type": "string"
+    },
+    "adapter": {
+      "type": "string"
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "started_at": {
+      "type": "string"
+    },
+    "finished_at": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "status": {
+      "enum": [
+        "running",
+        "passed",
+        "failed",
+        "error",
+        "skipped"
+      ]
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/event"
+      }
+    },
+    "first_divergence": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/divergence"
+        }
+      ]
+    },
+    "missing_capabilities": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "skip_reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "error": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "memorycheck_version": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "adapter_version": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "provider_version": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "python_version": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "platform": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "pytest_version": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "namespace": {
+      "type": "string"
+    },
+    "privacy": {
+      "type": "object",
+      "properties": {
+        "trace_values": {
+          "enum": [
+            "redacted",
+            "synthetic"
+          ]
+        },
+        "metadata": {
+          "const": "omitted"
+        },
+        "raw": {
+          "const": "omitted"
+        }
+      },
+      "required": [
+        "trace_values",
+        "metadata",
+        "raw"
+      ],
+      "additionalProperties": false
+    },
+    "cleanup": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "not_started",
+            "not_needed",
+            "disabled",
+            "blocked",
+            "completed",
+            "best_effort",
+            "unavailable",
+            "error"
+          ]
+        },
+        "scopes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "reason": {
+          "type": "string"
+        },
+        "error_type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schema_version",
+    "run_id",
+    "contract",
+    "adapter",
+    "capabilities",
+    "started_at",
+    "finished_at",
+    "status",
+    "events",
+    "first_divergence",
+    "missing_capabilities",
+    "skip_reason",
+    "error",
+    "notes",
+    "memorycheck_version",
+    "adapter_version",
+    "provider_version",
+    "python_version",
+    "platform",
+    "pytest_version",
+    "namespace",
+    "privacy",
+    "cleanup"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "check": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "enum": [
+            "contains",
+            "excludes",
+            "empty"
+          ]
+        },
+        "expected": {
+          "type": [
+            "string",
+            "boolean"
+          ]
+        },
+        "passed": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "expected",
+        "passed",
+        "message"
+      ],
+      "additionalProperties": false
+    },
+    "record": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "value": {
+          "type": "string"
+        },
+        "scope": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "metadata": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "id",
+        "value",
+        "scope",
+        "metadata"
+      ],
+      "additionalProperties": false
+    },
+    "observation": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "present",
+            "absent",
+            "unavailable",
+            "error"
+          ]
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "records": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/record"
+          }
+        },
+        "coverage": {
+          "type": "string"
+        },
+        "complete": {
+          "type": "boolean"
+        },
+        "assertion_status": {
+          "enum": [
+            "not_checked",
+            "passed",
+            "failed",
+            "error"
+          ]
+        },
+        "checks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/check"
+          }
+        },
+        "error": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status",
+        "values",
+        "records",
+        "coverage",
+        "complete",
+        "assertion_status",
+        "checks",
+        "error",
+        "notes"
+      ],
+      "additionalProperties": false
+    },
+    "event": {
+      "type": "object",
+      "properties": {
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "timestamp": {
+          "type": "number",
+          "minimum": 0
+        },
+        "operation": {
+          "enum": [
+            "create",
+            "query",
+            "update",
+            "delete",
+            "restart"
+          ]
+        },
+        "subject": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "scope": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "arguments": {
+          "type": "object"
+        },
+        "expected": {
+          "type": "object",
+          "properties": {
+            "oracles": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "api",
+                  "storage",
+                  "context",
+                  "behavior"
+                ]
+              },
+              "uniqueItems": true,
+              "minItems": 1
+            },
+            "contains": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "excludes": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "match": {
+              "enum": [
+                "exact",
+                "substring"
+              ]
+            },
+            "empty": {
+              "type": "boolean"
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        },
+        "observations": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/observation"
+          }
+        },
+        "status": {
+          "enum": [
+            "running",
+            "observed",
+            "passed",
+            "failed",
+            "error"
+          ]
+        },
+        "error": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "sequence",
+        "timestamp",
+        "operation",
+        "subject",
+        "scope",
+        "arguments",
+        "expected",
+        "observations",
+        "status",
+        "error"
+      ],
+      "additionalProperties": false
+    },
+    "divergence": {
+      "type": "object",
+      "properties": {
+        "observed_at_sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "operation": {
+          "type": "string"
+        },
+        "after_sequence": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "after_operation": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "last_verified_sequence": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        }
+      },
+      "required": [
+        "observed_at_sequence",
+        "operation",
+        "after_sequence",
+        "after_operation",
+        "last_verified_sequence"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

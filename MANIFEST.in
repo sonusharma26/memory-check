@@ -1,0 +1,12 @@
+include LICENSE README.md CHANGELOG.md CONTRIBUTING.md SECURITY.md pyproject.toml requirements-dev.txt
+recursive-include memorycheck *.py *.yaml *.json py.typed
+recursive-include contracts *.yaml
+recursive-include docs *.md *.json
+recursive-include examples *.py *.md *.yaml *.yml *.json
+recursive-include tests *.py
+recursive-include scripts *.py
+prune .memorycheck
+prune .venv
+prune build
+prune dist
+global-exclude __pycache__ *.py[cod] .DS_Store

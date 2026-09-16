@@ -1,0 +1,53 @@
+schema_version: '0.1'
+name: update_does_not_resurface_old_value
+description: Multiple corrections and repeated restarts never resurrect older versions.
+requires:
+- create
+- query
+- restart
+- update
+- user_scope
+scope:
+  user_id: alice
+steps:
+- create:
+    id: deployment_region
+    value: '{{canary:REGION}} = us-west'
+- expect:
+    query: '{{canary:REGION}}'
+    contains: '{{canary:REGION}} = us-west'
+- update:
+    id: deployment_region
+    value: '{{canary:REGION}} = eu-west'
+- expect:
+    query: '{{canary:REGION}}'
+    contains: '{{canary:REGION}} = eu-west'
+    excludes: '{{canary:REGION}} = us-west'
+- update:
+    id: deployment_region
+    value: '{{canary:REGION}} = ap-south'
+- expect:
+    query: '{{canary:REGION}}'
+    contains: '{{canary:REGION}} = ap-south'
+    excludes:
+    - '{{canary:REGION}} = us-west'
+    - '{{canary:REGION}} = eu-west'
+- restart: {}
+- expect:
+    query: '{{canary:REGION}}'
+    contains: '{{canary:REGION}} = ap-south'
+    excludes:
+    - '{{canary:REGION}} = us-west'
+    - '{{canary:REGION}} = eu-west'
+- restart: {}
+- expect:
+    query: '{{canary:REGION}}'
+    contains: '{{canary:REGION}} = ap-south'
+    excludes:
+    - '{{canary:REGION}} = us-west'
+    - '{{canary:REGION}} = eu-west'
+- expect:
+    query: '{{canary:REGION}} = us-west'
+    excludes:
+    - '{{canary:REGION}} = us-west'
+    - '{{canary:REGION}} = eu-west'

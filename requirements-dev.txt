@@ -1,0 +1,5 @@
+# Source-only development checks; installing the MemoryCheck distribution is not required.
+pytest>=7.4,<10
+PyYAML>=6.0,<7
+jsonschema>=4.18,<5
+tomli>=2,<3; python_version < "3.11"

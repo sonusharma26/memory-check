@@ -1,0 +1,25 @@
+schema_version: '0.1'
+name: remember_restart_recall
+description: A canary survives two complete runtime reconstructions.
+requires:
+- create
+- query
+- restart
+- user_scope
+scope:
+  user_id: alice
+steps:
+- create:
+    id: deployment_region
+    value: '{{canary:REGION}} = us-west'
+- expect:
+    query: '{{canary:REGION}}'
+    contains: '{{canary:REGION}} = us-west'
+- restart: {}
+- expect:
+    query: '{{canary:REGION}}'
+    contains: '{{canary:REGION}} = us-west'
+- restart: {}
+- expect:
+    query: '{{canary:REGION}}'
+    contains: '{{canary:REGION}} = us-west'

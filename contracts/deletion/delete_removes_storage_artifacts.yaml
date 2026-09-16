@@ -1,0 +1,45 @@
+schema_version: '0.1'
+name: delete_removes_storage_artifacts
+description: Deletion removes canary artifacts from both retrieval and explicitly
+  inspectable storage.
+requires:
+- create
+- delete
+- inspect_storage
+- query
+- restart
+- user_scope
+scope:
+  user_id: alice
+steps:
+- create:
+    id: canary
+    value: '{{canary:CANARY}}'
+- create:
+    id: control
+    value: '{{canary:CANARY_CONTROL}}'
+- expect:
+    query: MEMORYCHECK_CANARY
+    contains:
+    - '{{canary:CANARY}}'
+    - '{{canary:CANARY_CONTROL}}'
+    oracles:
+    - api
+    - storage
+- delete:
+    id: canary
+- expect:
+    query: MEMORYCHECK_CANARY
+    contains: '{{canary:CANARY_CONTROL}}'
+    excludes: '{{canary:CANARY}}'
+    oracles:
+    - api
+    - storage
+- restart: {}
+- expect:
+    query: MEMORYCHECK_CANARY
+    contains: '{{canary:CANARY_CONTROL}}'
+    excludes: '{{canary:CANARY}}'
+    oracles:
+    - api
+    - storage

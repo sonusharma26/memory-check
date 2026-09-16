@@ -1,0 +1,30 @@
+schema_version: '0.1'
+name: update_survives_restart
+description: Correction remains authoritative after reconstruction.
+requires:
+- create
+- query
+- restart
+- update
+- user_scope
+scope:
+  user_id: alice
+steps:
+- create:
+    id: deployment_region
+    value: '{{canary:REGION}} = us-west'
+- expect:
+    query: '{{canary:REGION}}'
+    contains: '{{canary:REGION}} = us-west'
+- update:
+    id: deployment_region
+    value: '{{canary:REGION}} = eu-west'
+- expect:
+    query: '{{canary:REGION}}'
+    contains: '{{canary:REGION}} = eu-west'
+    excludes: '{{canary:REGION}} = us-west'
+- restart: {}
+- expect:
+    query: '{{canary:REGION}}'
+    contains: '{{canary:REGION}} = eu-west'
+    excludes: '{{canary:REGION}} = us-west'

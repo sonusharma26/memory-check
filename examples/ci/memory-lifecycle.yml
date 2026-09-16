@@ -1,0 +1,27 @@
+# Copy into your consuming project's .github/workflows/ after configuring its adapter.
+name: Memory lifecycle
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  lifecycle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: python -m pip install -e '.[dev]'
+        # This installs the MemoryCheck checkout. In a consuming project, replace
+        # it with that project's dependencies plus the validated MemoryCheck release.
+      - run: pytest --memorycheck -m memorycheck
+      - name: Redacted failure traces (never upload .memorycheck/runs)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: memory-lifecycle-traces
+          path: .memorycheck/traces/*.json
+          include-hidden-files: true
+          if-no-files-found: ignore
+          retention-days: 7

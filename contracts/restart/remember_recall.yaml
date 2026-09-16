@@ -1,0 +1,16 @@
+schema_version: '0.1'
+name: remember_recall
+description: A newly created exact canary can be recalled.
+requires:
+- create
+- query
+- user_scope
+scope:
+  user_id: alice
+steps:
+- create:
+    id: deployment_region
+    value: '{{canary:REGION}} = us-west'
+- expect:
+    query: '{{canary:REGION}}'
+    contains: '{{canary:REGION}} = us-west'

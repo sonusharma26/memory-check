@@ -1,0 +1,499 @@
+{
+  "memorycheck_version": "0.1.0",
+  "adapter_version": "0.1.0",
+  "provider_version": null,
+  "python_version": "3.13.5",
+  "platform": "linux",
+  "pytest_version": "9.0.2",
+  "namespace": "mc_7a9eb1ff4a764d2b9f4b9536b60392b8",
+  "cleanup": {
+    "status": "completed",
+    "scopes": 1
+  },
+  "schema_version": "0.1",
+  "run_id": "7a9eb1ff-4a76-4d2b-9f4b-9536b60392b8",
+  "contract": "delete_survives_restart",
+  "adapter": "BrokenRestartMemory",
+  "capabilities": [
+    "cleanup_scope",
+    "create",
+    "delete",
+    "inspect_storage",
+    "query",
+    "restart",
+    "session_scope",
+    "tenant_scope",
+    "update",
+    "user_scope"
+  ],
+  "started_at": "2026-09-16T10:43:28.815149+00:00",
+  "finished_at": "2026-09-16T10:43:28.821509+00:00",
+  "status": "failed",
+  "events": [
+    {
+      "sequence": 1,
+      "timestamp": 0.000388,
+      "operation": "create",
+      "subject": "<redacted:89c8397e704a>",
+      "scope": {
+        "user_id": "<redacted:437807d47be7>"
+      },
+      "arguments": {
+        "value": "MEMORYCHECK_CANARY_F310276CF6A5E07D",
+        "alias": "<redacted:89c8397e704a>",
+        "memory_id": "<redacted:2b25ff04e295>"
+      },
+      "expected": {},
+      "observations": {},
+      "status": "passed",
+      "error": null
+    },
+    {
+      "sequence": 2,
+      "timestamp": 0.001853,
+      "operation": "create",
+      "subject": "<redacted:9fb39aa50078>",
+      "scope": {
+        "user_id": "<redacted:437807d47be7>"
+      },
+      "arguments": {
+        "value": "MEMORYCHECK_CANARY_CONTROL_DDE123A300942E76",
+        "alias": "<redacted:9fb39aa50078>",
+        "memory_id": "<redacted:1b1a37dfd3c4>"
+      },
+      "expected": {},
+      "observations": {},
+      "status": "passed",
+      "error": null
+    },
+    {
+      "sequence": 3,
+      "timestamp": 0.003118,
+      "operation": "query",
+      "subject": "<redacted:94a8c5153056>",
+      "scope": {
+        "user_id": "<redacted:437807d47be7>"
+      },
+      "arguments": {
+        "query": "<redacted:94a8c5153056>"
+      },
+      "expected": {
+        "oracles": [
+          "api"
+        ],
+        "contains": [
+          "MEMORYCHECK_CANARY_F310276CF6A5E07D",
+          "MEMORYCHECK_CANARY_CONTROL_DDE123A300942E76"
+        ],
+        "excludes": [],
+        "match": "substring"
+      },
+      "observations": {
+        "api": {
+          "status": "present",
+          "values": [
+            "MEMORYCHECK_CANARY_F310276CF6A5E07D",
+            "MEMORYCHECK_CANARY_CONTROL_DDE123A300942E76"
+          ],
+          "records": [
+            {
+              "id": "<redacted:2b25ff04e295>",
+              "value": "MEMORYCHECK_CANARY_F310276CF6A5E07D",
+              "scope": {
+                "user_id": "<redacted:437807d47be7>"
+              },
+              "metadata": {}
+            },
+            {
+              "id": "<redacted:1b1a37dfd3c4>",
+              "value": "MEMORYCHECK_CANARY_CONTROL_DDE123A300942E76",
+              "scope": {
+                "user_id": "<redacted:437807d47be7>"
+              },
+              "metadata": {}
+            }
+          ],
+          "coverage": "Public retrieval response; query absence is not physical erasure",
+          "complete": true,
+          "assertion_status": "passed",
+          "checks": [
+            {
+              "kind": "contains",
+              "expected": "MEMORYCHECK_CANARY_F310276CF6A5E07D",
+              "passed": true,
+              "message": "Required value present: satisfied ('MEMORYCHECK_CANARY_F310276CF6A5E07D')"
+            },
+            {
+              "kind": "contains",
+              "expected": "MEMORYCHECK_CANARY_CONTROL_DDE123A300942E76",
+              "passed": true,
+              "message": "Required value present: satisfied ('MEMORYCHECK_CANARY_CONTROL_DDE123A300942E76')"
+            }
+          ],
+          "error": null,
+          "notes": []
+        },
+        "storage": {
+          "status": "present",
+          "values": [
+            "MEMORYCHECK_CANARY_F310276CF6A5E07D",
+            "MEMORYCHECK_CANARY_CONTROL_DDE123A300942E76"
+          ],
+          "records": [
+            {
+              "id": "<redacted:2b25ff04e295>",
+              "value": "MEMORYCHECK_CANARY_F310276CF6A5E07D",
+              "scope": {
+                "user_id": "<redacted:437807d47be7>"
+              },
+              "metadata": {}
+            },
+            {
+              "id": "<redacted:1b1a37dfd3c4>",
+              "value": "MEMORYCHECK_CANARY_CONTROL_DDE123A300942E76",
+              "scope": {
+                "user_id": "<redacted:437807d47be7>"
+              },
+              "metadata": {}
+            }
+          ],
+          "coverage": "Adapter-declared storage boundary; see adapter documentation",
+          "complete": true,
+          "assertion_status": "not_checked",
+          "checks": [],
+          "error": null,
+          "notes": [
+            "Inspector notes omitted by trace privacy policy"
+          ]
+        },
+        "context": {
+          "status": "unavailable",
+          "values": [],
+          "records": [],
+          "coverage": "Optional oracle boundary; see adapter documentation",
+          "complete": false,
+          "assertion_status": "not_checked",
+          "checks": [],
+          "error": null,
+          "notes": [
+            "Inspector notes omitted by trace privacy policy"
+          ]
+        },
+        "behavior": {
+          "status": "unavailable",
+          "values": [],
+          "records": [],
+          "coverage": "Optional oracle boundary; see adapter documentation",
+          "complete": false,
+          "assertion_status": "not_checked",
+          "checks": [],
+          "error": null,
+          "notes": [
+            "Inspector notes omitted by trace privacy policy"
+          ]
+        }
+      },
+      "status": "passed",
+      "error": null
+    },
+    {
+      "sequence": 4,
+      "timestamp": 0.003299,
+      "operation": "delete",
+      "subject": "<redacted:89c8397e704a>",
+      "scope": {
+        "user_id": "<redacted:437807d47be7>"
+      },
+      "arguments": {
+        "memory_id": "<redacted:2b25ff04e295>"
+      },
+      "expected": {},
+      "observations": {},
+      "status": "passed",
+      "error": null
+    },
+    {
+      "sequence": 5,
+      "timestamp": 0.003401,
+      "operation": "query",
+      "subject": "<redacted:94a8c5153056>",
+      "scope": {
+        "user_id": "<redacted:437807d47be7>"
+      },
+      "arguments": {
+        "query": "<redacted:94a8c5153056>"
+      },
+      "expected": {
+        "oracles": [
+          "api"
+        ],
+        "contains": [
+          "MEMORYCHECK_CANARY_CONTROL_DDE123A300942E76"
+        ],
+        "excludes": [
+          "MEMORYCHECK_CANARY_F310276CF6A5E07D"
+        ],
+        "match": "substring"
+      },
+      "observations": {
+        "api": {
+          "status": "present",
+          "values": [
+            "MEMORYCHECK_CANARY_CONTROL_DDE123A300942E76"
+          ],
+          "records": [
+            {
+              "id": "<redacted:1b1a37dfd3c4>",
+              "value": "MEMORYCHECK_CANARY_CONTROL_DDE123A300942E76",
+              "scope": {
+                "user_id": "<redacted:437807d47be7>"
+              },
+              "metadata": {}
+            }
+          ],
+          "coverage": "Public retrieval response; query absence is not physical erasure",
+          "complete": true,
+          "assertion_status": "passed",
+          "checks": [
+            {
+              "kind": "contains",
+              "expected": "MEMORYCHECK_CANARY_CONTROL_DDE123A300942E76",
+              "passed": true,
+              "message": "Required value present: satisfied ('MEMORYCHECK_CANARY_CONTROL_DDE123A300942E76')"
+            },
+            {
+              "kind": "excludes",
+              "expected": "MEMORYCHECK_CANARY_F310276CF6A5E07D",
+              "passed": true,
+              "message": "Excluded value absent: satisfied ('MEMORYCHECK_CANARY_F310276CF6A5E07D')"
+            }
+          ],
+          "error": null,
+          "notes": []
+        },
+        "storage": {
+          "status": "present",
+          "values": [
+            "MEMORYCHECK_CANARY_F310276CF6A5E07D",
+            "MEMORYCHECK_CANARY_CONTROL_DDE123A300942E76"
+          ],
+          "records": [
+            {
+              "id": "<redacted:2b25ff04e295>",
+              "value": "MEMORYCHECK_CANARY_F310276CF6A5E07D",
+              "scope": {
+                "user_id": "<redacted:437807d47be7>"
+              },
+              "metadata": {}
+            },
+            {
+              "id": "<redacted:1b1a37dfd3c4>",
+              "value": "MEMORYCHECK_CANARY_CONTROL_DDE123A300942E76",
+              "scope": {
+                "user_id": "<redacted:437807d47be7>"
+              },
+              "metadata": {}
+            }
+          ],
+          "coverage": "Adapter-declared storage boundary; see adapter documentation",
+          "complete": true,
+          "assertion_status": "not_checked",
+          "checks": [],
+          "error": null,
+          "notes": [
+            "Inspector notes omitted by trace privacy policy"
+          ]
+        },
+        "context": {
+          "status": "unavailable",
+          "values": [],
+          "records": [],
+          "coverage": "Optional oracle boundary; see adapter documentation",
+          "complete": false,
+          "assertion_status": "not_checked",
+          "checks": [],
+          "error": null,
+          "notes": [
+            "Inspector notes omitted by trace privacy policy"
+          ]
+        },
+        "behavior": {
+          "status": "unavailable",
+          "values": [],
+          "records": [],
+          "coverage": "Optional oracle boundary; see adapter documentation",
+          "complete": false,
+          "assertion_status": "not_checked",
+          "checks": [],
+          "error": null,
+          "notes": [
+            "Inspector notes omitted by trace privacy policy"
+          ]
+        }
+      },
+      "status": "passed",
+      "error": null
+    },
+    {
+      "sequence": 6,
+      "timestamp": 0.00351,
+      "operation": "restart",
+      "subject": null,
+      "scope": {
+        "user_id": "<redacted:55e487e311cb>"
+      },
+      "arguments": {},
+      "expected": {},
+      "observations": {},
+      "status": "passed",
+      "error": null
+    },
+    {
+      "sequence": 7,
+      "timestamp": 0.003589,
+      "operation": "query",
+      "subject": "<redacted:94a8c5153056>",
+      "scope": {
+        "user_id": "<redacted:437807d47be7>"
+      },
+      "arguments": {
+        "query": "<redacted:94a8c5153056>"
+      },
+      "expected": {
+        "oracles": [
+          "api"
+        ],
+        "contains": [
+          "MEMORYCHECK_CANARY_CONTROL_DDE123A300942E76"
+        ],
+        "excludes": [
+          "MEMORYCHECK_CANARY_F310276CF6A5E07D"
+        ],
+        "match": "substring"
+      },
+      "observations": {
+        "api": {
+          "status": "present",
+          "values": [
+            "MEMORYCHECK_CANARY_F310276CF6A5E07D",
+            "MEMORYCHECK_CANARY_CONTROL_DDE123A300942E76"
+          ],
+          "records": [
+            {
+              "id": "<redacted:2b25ff04e295>",
+              "value": "MEMORYCHECK_CANARY_F310276CF6A5E07D",
+              "scope": {
+                "user_id": "<redacted:437807d47be7>"
+              },
+              "metadata": {}
+            },
+            {
+              "id": "<redacted:1b1a37dfd3c4>",
+              "value": "MEMORYCHECK_CANARY_CONTROL_DDE123A300942E76",
+              "scope": {
+                "user_id": "<redacted:437807d47be7>"
+              },
+              "metadata": {}
+            }
+          ],
+          "coverage": "Public retrieval response; query absence is not physical erasure",
+          "complete": true,
+          "assertion_status": "failed",
+          "checks": [
+            {
+              "kind": "contains",
+              "expected": "MEMORYCHECK_CANARY_CONTROL_DDE123A300942E76",
+              "passed": true,
+              "message": "Required value present: satisfied ('MEMORYCHECK_CANARY_CONTROL_DDE123A300942E76')"
+            },
+            {
+              "kind": "excludes",
+              "expected": "MEMORYCHECK_CANARY_F310276CF6A5E07D",
+              "passed": false,
+              "message": "Excluded value absent: not established ('MEMORYCHECK_CANARY_F310276CF6A5E07D')"
+            }
+          ],
+          "error": null,
+          "notes": []
+        },
+        "storage": {
+          "status": "present",
+          "values": [
+            "MEMORYCHECK_CANARY_F310276CF6A5E07D",
+            "MEMORYCHECK_CANARY_CONTROL_DDE123A300942E76"
+          ],
+          "records": [
+            {
+              "id": "<redacted:2b25ff04e295>",
+              "value": "MEMORYCHECK_CANARY_F310276CF6A5E07D",
+              "scope": {
+                "user_id": "<redacted:437807d47be7>"
+              },
+              "metadata": {}
+            },
+            {
+              "id": "<redacted:1b1a37dfd3c4>",
+              "value": "MEMORYCHECK_CANARY_CONTROL_DDE123A300942E76",
+              "scope": {
+                "user_id": "<redacted:437807d47be7>"
+              },
+              "metadata": {}
+            }
+          ],
+          "coverage": "Adapter-declared storage boundary; see adapter documentation",
+          "complete": true,
+          "assertion_status": "not_checked",
+          "checks": [],
+          "error": null,
+          "notes": [
+            "Inspector notes omitted by trace privacy policy"
+          ]
+        },
+        "context": {
+          "status": "unavailable",
+          "values": [],
+          "records": [],
+          "coverage": "Optional oracle boundary; see adapter documentation",
+          "complete": false,
+          "assertion_status": "not_checked",
+          "checks": [],
+          "error": null,
+          "notes": [
+            "Inspector notes omitted by trace privacy policy"
+          ]
+        },
+        "behavior": {
+          "status": "unavailable",
+          "values": [],
+          "records": [],
+          "coverage": "Optional oracle boundary; see adapter documentation",
+          "complete": false,
+          "assertion_status": "not_checked",
+          "checks": [],
+          "error": null,
+          "notes": [
+            "Inspector notes omitted by trace privacy policy"
+          ]
+        }
+      },
+      "status": "failed",
+      "error": null
+    }
+  ],
+  "first_divergence": {
+    "observed_at_sequence": 7,
+    "operation": "query",
+    "after_sequence": 6,
+    "after_operation": "restart",
+    "last_verified_sequence": 5
+  },
+  "missing_capabilities": [],
+  "skip_reason": null,
+  "error": null,
+  "notes": [],
+  "privacy": {
+    "trace_values": "synthetic",
+    "metadata": "omitted",
+    "raw": "omitted"
+  }
+}
