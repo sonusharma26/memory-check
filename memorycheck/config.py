@@ -87,15 +87,20 @@ def read_settings(path: str | Path | None = None, *, start: str | Path | None = 
     selected = Path(path).resolve() if path is not None else None
     if selected is None:
         for parent in (root, *root.parents):
-            candidate = parent / "pyproject.toml"
-            if candidate.is_file():
-                selected = candidate
+            # A standalone file is convenient for applications that already
+            # own pyproject.toml and do not want test-tool configuration there.
+            for name in ("memorycheck.toml", "pyproject.toml"):
+                candidate = parent / name
+                if candidate.is_file():
+                    selected = candidate
+                    break
+            if selected is not None:
                 break
     settings = get_settings().updated(project_root=root)
     if selected is not None:
         try:
             if selected.stat().st_size > 1_048_576:
-                raise AdapterConfigurationError("pyproject.toml exceeds the 1 MiB configuration limit")
+                raise AdapterConfigurationError("MemoryCheck configuration exceeds the 1 MiB limit")
             with selected.open("rb") as stream:
                 data = tomllib.load(stream)
             table = data.get("tool", {}).get("memorycheck", {})

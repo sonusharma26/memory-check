@@ -25,6 +25,37 @@ from memorycheck.trace.serializer import load_trace, save_trace, write_json_atom
 LABELS = {"passed": "PASS", "failed": "FAIL", "skipped": "SKIP", "error": "ERROR"}
 
 
+def _init_template(adapter: str) -> str:
+    options = {
+        "reference": '''# MemoryCheck project configuration. Keep this file out of production deployments.
+[tool.memorycheck]
+adapter = "reference"
+trace_values = "redacted"
+
+[tool.memorycheck.adapter_options]
+path = ".memorycheck/reference.json"
+''',
+        "langgraph": '''# MemoryCheck project configuration. Use a dedicated test database only.
+[tool.memorycheck]
+adapter = "langgraph"
+trace_values = "redacted"
+
+[tool.memorycheck.adapter_options]
+connection_env = "MEMORYCHECK_POSTGRES_DSN"
+setup = true
+''',
+        "mem0": '''# MemoryCheck project configuration. Do not commit provider credentials.
+[tool.memorycheck]
+adapter = "mem0"
+trace_values = "redacted"
+
+[tool.memorycheck.adapter_options]
+config_file = "mem0-config.json"
+''',
+    }
+    return options[adapter]
+
+
 def _contracts(sources: list[str]) -> list[Contract]:
     contracts = []
     for source in sources:
@@ -59,6 +90,10 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--version", action="store_true")
     parser.add_argument("--verbose", "-v", action="store_true")
     commands = parser.add_subparsers(dest="command")
+    init = commands.add_parser("init", help="Create a standalone MemoryCheck configuration file")
+    init.add_argument("--adapter", choices=["reference", "langgraph", "mem0"], default="reference")
+    init.add_argument("--path", default="memorycheck.toml", metavar="PATH")
+    init.add_argument("--force", action="store_true", help="Replace an existing file at --path")
     run = commands.add_parser("run", help="Run YAML, a directory, builtin, or builtin:NAME (default: builtin)")
     _common(run)
     run.add_argument("contracts", nargs="*", default=["builtin"], metavar="CONTRACT")
@@ -154,6 +189,19 @@ def main(argv: Sequence[str] | None = None) -> int:
         parser.print_help()
         return 2
     try:
+        if args.command == "init":
+            path = Path(args.path).resolve()
+            if path.exists() and not args.force:
+                raise MemoryCheckError(f"{path} already exists; choose another --path or use --force")
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(_init_template(args.adapter), encoding="utf-8")
+            print(f"Created {path}")
+            print(f"Next: memorycheck doctor --config {path.name} --probe")
+            if args.adapter == "langgraph":
+                print("Set MEMORYCHECK_POSTGRES_DSN to a dedicated test database and install memorycheck[postgres].")
+            elif args.adapter == "mem0":
+                print("Create the referenced private Mem0 config and install memorycheck[mem0].")
+            return 0
         if args.command == "list":
             contracts = [load_builtin(name) for name in builtin_names()]
             for category in ["Correction", "Deletion", "Restart / recall", "Isolation"]:

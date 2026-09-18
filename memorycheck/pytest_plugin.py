@@ -139,7 +139,7 @@ def pytest_runtest_makereport(item: pytest.Item, call: pytest.CallInfo):
 
 @pytest.hookimpl(tryfirst=True)
 def pytest_report_teststatus(report, config):
-    if report.failed and dict(report.user_properties).get("memorycheck_status") == "error":
+    if report.failed and dict(getattr(report, "user_properties", ())).get("memorycheck_status") == "error":
         return "error", "E", "ERROR"
     return None
 

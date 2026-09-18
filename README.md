@@ -4,6 +4,47 @@
 
 MemoryCheck is a pytest-compatible lifecycle conformance testing toolkit for persistent AI memory systems. It checks correction, deletion, restart durability, and user isolation with deterministic canaries, capability-aware contracts, separate API/storage observations, and private diagnostic traces. It is not a memory framework, a compliance certification, or an LLM benchmark.
 
+## Install and integrate
+
+MemoryCheck is currently a source release candidate, so install it from this checkout:
+
+```powershell
+python -m pip install -e .
+memorycheck init
+```
+
+`memorycheck init` creates a small standalone `memorycheck.toml`; it never edits an existing `pyproject.toml`. The default configuration uses the bundled local reference adapter, so you can add the fixture to a pytest test immediately:
+
+```python
+def test_a_deleted_memory_does_not_return(memorycheck):
+    value = memorycheck.canary("PREFERENCE")
+    fact = memorycheck.create(value, user_id="alice")
+    memorycheck.delete(fact)
+    memorycheck.restart()
+    memorycheck.expect("MEMORYCHECK_PREFERENCE", user_id="alice").excludes(value)
+```
+
+```powershell
+pytest
+```
+
+The pytest plugin is installed automatically. Each test receives a unique namespace, writes redacted failure traces only when needed, and cleans up the synthetic records it owns.
+
+### Connect a persistent backend
+
+Generate an adapter-specific configuration instead of hand-editing project metadata:
+
+```powershell
+memorycheck init --adapter langgraph
+# Set MEMORYCHECK_POSTGRES_DSN to a dedicated test database.
+python -m pip install -e ".[postgres]"
+memorycheck doctor --probe
+```
+
+For Mem0, use `memorycheck init --adapter mem0`, install `memorycheck[mem0]`, and provide the generated configuration's private `mem0-config.json`. For a custom application adapter, use the short factory example below. See [adapter setup](docs/ADAPTERS.md) for all supported options.
+
+For any backend, run `memorycheck doctor --probe` before a full suite: it validates configuration and exercises a short synthetic lifecycle. A `PASS` only covers the contract's available observations; `SKIP` is an explicit coverage gap, never a pass.
+
 ## See it catch a bug
 
 From this extracted source directory, use a Python 3.10–3.13 virtual environment:

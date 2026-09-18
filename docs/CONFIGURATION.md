@@ -1,6 +1,6 @@
 # Configuration
 
-Configuration precedence is programmatic defaults, nearest discovered `pyproject.toml`, then explicit CLI/pytest overrides. An overriding `memory_adapter` fixture takes precedence for adapter construction; the MemoryCheck session still receives project trace, timeout, isolation, and cleanup settings. Relative configured paths resolve against the selected TOML file's directory, or the current project directory when no file exists.
+Configuration precedence is programmatic defaults, nearest discovered `memorycheck.toml` (or `pyproject.toml` when no standalone file exists), then explicit CLI/pytest overrides. Run `memorycheck init` to create a standalone file without editing your project metadata. An overriding `memory_adapter` fixture takes precedence for adapter construction; the MemoryCheck session still receives project trace, timeout, isolation, and cleanup settings. Relative configured paths resolve against the selected TOML file's directory, or the current project directory when no file exists.
 
 `memorycheck.configure(...)` changes defaults for subsequently constructed Python sessions in the current context. It does not mutate existing sessions. Passing an explicit immutable `Settings(...)` to `MemoryCheck` or `ContractRunner` is preferable for library integrations and concurrent callers.
 
