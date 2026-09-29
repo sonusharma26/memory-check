@@ -1,0 +1,105 @@
+name: Live adapter checks
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/live-adapters.yml
+      - examples/mem0/live_factory.py
+      - memorycheck/**
+      - pyproject.toml
+  workflow_dispatch:
+    inputs:
+      cloud:
+        description: Run against the configured Qdrant Cloud and PostgreSQL test databases
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  postgres:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: memorycheck
+          POSTGRES_PASSWORD: disposable-test-password
+          POSTGRES_DB: memorycheck
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U memorycheck -d memorycheck"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      MEMORYCHECK_POSTGRES_DSN: postgresql://memorycheck:disposable-test-password@localhost:5432/memorycheck
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -e '.[postgres]'
+      - run: memorycheck doctor --adapter langgraph --probe
+      - run: memorycheck run builtin --adapter langgraph
+      - run: python -m pytest examples/langgraph -q
+
+  mem0:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      qdrant:
+        image: qdrant/qdrant:v1.15.2
+        ports:
+          - 6333:6333
+    env:
+      MEMORYCHECK_QDRANT_URL: http://localhost:6333
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Wait for Qdrant
+        run: |
+          for attempt in {1..30}; do
+            if curl --fail --silent http://localhost:6333/healthz >/dev/null; then exit 0; fi
+            sleep 2
+          done
+          exit 1
+      - run: python -m pip install -e '.[mem0]' 'fastembed==0.8.1'
+      - name: Cache the public CPU embedding model
+        run: python -c "from fastembed import TextEmbedding; TextEmbedding(model_name='BAAI/bge-small-en-v1.5')"
+      - run: memorycheck doctor --probe --adapter examples.mem0.live_factory:make_adapter --operation-timeout 90 --restart-timeout 90 --contract-timeout 300
+      - run: memorycheck run builtin --adapter examples.mem0.live_factory:make_adapter --operation-timeout 90 --restart-timeout 90 --contract-timeout 300
+
+  cloud:
+    if: github.event_name == 'workflow_dispatch' && inputs.cloud
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      MEMORYCHECK_QDRANT_URL: ${{ secrets.MEMORYCHECK_QDRANT_URL }}
+      MEMORYCHECK_QDRANT_API_KEY: ${{ secrets.MEMORYCHECK_QDRANT_API_KEY }}
+      MEMORYCHECK_POSTGRES_DSN: ${{ secrets.MEMORYCHECK_POSTGRES_DSN }}
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Require dedicated cloud test targets
+        run: |
+          test -n "$MEMORYCHECK_QDRANT_URL"
+          test -n "$MEMORYCHECK_QDRANT_API_KEY"
+          test -n "$MEMORYCHECK_POSTGRES_DSN"
+      - run: python -m pip install -e '.[postgres,mem0]' 'fastembed==0.8.1'
+      - name: Cache the public CPU embedding model
+        run: python -c "from fastembed import TextEmbedding; TextEmbedding(model_name='BAAI/bge-small-en-v1.5')"
+      - run: memorycheck doctor --adapter langgraph --probe
+      - run: memorycheck run builtin --adapter langgraph
+      - run: memorycheck doctor --probe --adapter examples.mem0.live_factory:make_adapter --operation-timeout 90 --restart-timeout 90 --contract-timeout 300
+      - run: memorycheck run builtin --adapter examples.mem0.live_factory:make_adapter --operation-timeout 90 --restart-timeout 90 --contract-timeout 300
