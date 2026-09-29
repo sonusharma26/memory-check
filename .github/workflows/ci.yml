@@ -29,6 +29,8 @@ jobs:
       - name: Install source-check dependencies only
         run: |
           python -m pip install --only-binary=:all: -r requirements-dev.txt
+      - name: Prepare pytest temporary directory
+        run: python -c "from pathlib import Path; Path('.memorycheck/ci-tmp').mkdir(parents=True, exist_ok=True)"
       - name: Focused source regressions (no MemoryCheck build)
         run: python -m pytest -q --basetemp=.memorycheck/ci-tmp
       - name: Upload redacted JSON traces only
